@@ -15,10 +15,16 @@ D:\hary\sirkursus-desktop-master\src\main\java\model\Instruktur.java
 D:\hary\sirkursus-desktop-master\src\main\java\model\Kursus.java
 D:\hary\sirkursus-desktop-master\src\main\java\model\Orang.java
 D:\hary\sirkursus-desktop-master\src\main\java\model\Peserta.java
+<<<<<<< HEAD
 D:\hary\sirkursus-desktop-master\src\main\java\PesertaFrame.java
 D:\hary\sirkursus-desktop-master\src\main\java\view\FormPendaftaranAwal.java
 D:\hary\sirkursus-desktop-master\src\main\java\view\FormPendaftaranKursus.java
 D:\hary\sirkursus-desktop-master\src\main\java\view\FormPeserta.java
 D:\hary\sirkursus-desktop-master\src\main\java\view\MasterPeserta.java
 D:\hary\sirkursus-desktop-master\src\main\java\view\PesertaFrame.java
+=======
+D:\hary\sirkursus-desktop-master\src\main\java\view\FormPendaftaranAwal.java
+D:\hary\sirkursus-desktop-master\src\main\java\view\FormPendaftaranKursus.java
+D:\hary\sirkursus-desktop-master\src\main\java\view\FormPeserta.java
+>>>>>>> 7c1b6e3bb4c536df5c2bdc944fc51c33649d0772
 D:\hary\sirkursus-desktop-master\src\main\java\view\txtHasil.java

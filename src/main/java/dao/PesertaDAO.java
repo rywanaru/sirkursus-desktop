@@ -1,6 +1,7 @@
 package dao;
 
 import config.Database;
+<<<<<<< HEAD
 import model.Peserta;
 
 import java.sql.Connection;
@@ -30,12 +31,27 @@ public class PesertaDAO {
         String sql = "INSERT INTO peserta (nim, nama, jenis_kelamin, prodi, no_hp, email) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+=======
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import model.Peserta;
+
+public class PesertaDAO {
+    public boolean insert(Peserta p) throws SQLException {
+        String sql = "INSERT INTO peserta (nim, nama, jenis_kelamin, prodi, no_hp, email) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+>>>>>>> 7c1b6e3bb4c536df5c2bdc944fc51c33649d0772
             ps.setString(1, p.getNim());
             ps.setString(2, p.getNama());
             ps.setString(3, p.getJenisKelamin());
             ps.setString(4, p.getProdi());
             ps.setString(5, p.getNoHp());
             ps.setString(6, p.getEmail());
+<<<<<<< HEAD
             return ps.executeUpdate() > 0;
         }
     }
@@ -97,4 +113,10 @@ public class PesertaDAO {
         }
         return data;
     }
+=======
+            
+            return ps.executeUpdate() > 0;
+        }
+    }
+>>>>>>> 7c1b6e3bb4c536df5c2bdc944fc51c33649d0772
 }
