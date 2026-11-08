@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 package Latihan; //package
 
 public class LatihanBiayaKursus {       //class
