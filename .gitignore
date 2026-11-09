@@ -1,0 +1,20 @@
+# Mengabaikan folder target hasil compile Java (Paling Penting!)
+target/
+*.class
+
+# Mengabaikan folder konfigurasi NetBeans / IDE
+build/
+nbproject/
+nbdeploy/
+dist/
+.mtformtemplates/
+
+# Mengabaikan file log jalannya aplikasi
+*.log
+
+# Mengabaikan folder bawaan editor lain jika ada
+.idea/
+.settings/
+.classpath
+.project
+*.iml

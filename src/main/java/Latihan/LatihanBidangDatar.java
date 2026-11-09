@@ -3,51 +3,53 @@ package latihan;
 import java.util.Scanner;
 
 public class LatihanBidangDatar {
-    public static void main(String[] args) {
 
-        // PERSEGI
-        try (Scanner input = new Scanner(System.in)) {
-            // PERSEGI
-            System.out.println("=== PERSEGI ===");
-            System.out.print("Masukkan sisi: ");
-            double sisi = input.nextDouble();
-            
-            double luasPersegi = sisi * sisi;
-            double kelilingPersegi = 4 * sisi;
-            
-            System.out.println("Luas     : " + luasPersegi);
-            System.out.println("Keliling : " + kelilingPersegi);
-            
-            
-            // PERSEGI PANJANG
-            System.out.println();
-            System.out.println("=== PERSEGI PANJANG ===");
-            
-            System.out.print("Masukkan panjang: ");
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+
+        // Menampilkan Pilihan Menu
+        System.out.println("=== MENU HITUNG BIDANG DATAR ===");
+        System.out.println("1. Persegi Panjang");
+        System.out.println("2. Lingkaran");
+        System.out.print("Pilih jenis bidang datar (1/2): ");
+        int pilihan = input.nextInt();
+
+        System.out.println("--------------------------------");
+
+        // Proses Logika Berdasarkan Pilihan
+        if (pilihan == 1) {
+            // Input Persegi Panjang
+            System.out.print("Masukkan Panjang (cm): ");
             double panjang = input.nextDouble();
-            
-            System.out.print("Masukkan lebar: ");
+            System.out.print("Masukkan Lebar (cm)  : ");
             double lebar = input.nextDouble();
-            
-            double luasPersegiPanjang = panjang * lebar;
-            double kelilingPersegiPanjang = 2 * (panjang + lebar);
-            
-            System.out.println("Luas     : " + luasPersegiPanjang);
-            System.out.println("Keliling : " + kelilingPersegiPanjang);
-            
-            
-            // LINGKARAN
-            System.out.println();
-            System.out.println("=== LINGKARAN ===");
-            
-            System.out.print("Masukkan jari-jari: ");
-            double jariJari = input.nextDouble();
-            
-            double luasLingkaran = Math.PI * jariJari * jariJari;
-            double kelilingLingkaran = 2 * Math.PI * jariJari;
-            
-            System.out.printf("Luas     : %.2f%n", luasLingkaran);
-            System.out.printf("Keliling : %.2f%n", kelilingLingkaran);
+
+            // Rumus Persegi Panjang
+            double luas = panjang * lebar;
+            double keliling = 2 * (panjang + lebar);
+
+            // Output Hasil
+            System.out.println("\n========= HASIL REKAP =========");
+            System.out.printf("Luas Persegi Panjang    : %.2f cm²%n", luas);
+            System.out.printf("Keliling Persegi Panjang: %.2f cm%n", keliling);
+
+        } else if (pilihan == 2) {
+            // Input Lingkaran
+            System.out.print("Masukkan Jari-jari (cm): ");
+            double r = input.nextDouble();
+
+            // Rumus Lingkaran
+            double luas = Math.PI * r * r;
+            double keliling = 2 * Math.PI * r;
+
+            // Output Hasil
+            System.out.println("\n========= HASIL REKAP =========");
+            System.out.printf("Luas Lingkaran    : %.2f cm²%n", luas);
+            System.out.printf("Keliling Lingkaran: %.2f cm%n", keliling);
+
+        } else {
+            System.out.println("Error: Pilihan menu tidak valid!");
         }
+        System.out.println("===============================");
     }
 }
