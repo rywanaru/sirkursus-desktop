@@ -1,300 +1,231 @@
 package view;
 
 import dao.PesertaDAO;
-import java.sql.SQLException;
-import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import model.Peserta;
 
-public class FormPeserta extends JFrame {
+import javax.swing.*;
+import java.awt.*;
+import java.sql.SQLException;
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FormPeserta.class.getName());
-    private ButtonGroup bgGender;
+public class FormPeserta extends javax.swing.JFrame {
+    // Palet warna selaras dengan tampilan Master Data Peserta & DashboardFrame
+    private static final Color NAVY_DARK = new Color(16, 59, 86);      // #103B56 (Header & Tombol Utama)
+    private static final Color ICE_BLUE_BG = new Color(227, 238, 245);  // #E3EEF5 (Background Form)
+    private static final Color BTN_RESET_BG = new Color(214, 230, 242); // #D6E6F2 (Tombol Sekunder / Reset)
+    private static final Color TEXT_DARK = new Color(25, 39, 52);       // #192734 (Label & Teks Utama)
+    private static final Color BORDER_SOFT = new Color(176, 200, 218);  // #B0C8DA (Garis Batas)
+
+    private JPanel jPanel4, jPanel5;
+    private JLabel jLabel19, jLabel20, jLabel21, jLabel22, jLabel23, jLabel24, jLabel25, jLabel26, jLabel27, jLabel28, jLabel29;
+    private JTextPane txtNim, txtNama, txtProdi, txtNoHp, txtEmail, txtRingkasanPendaftaran;
+    private JPasswordField txtKodeAkses;
+    private JRadioButton rbLaki, rbPerempuan;
+    private ButtonGroup bgJk;
+    private JComboBox<String> cmbPilihanKursus;
+    private JCheckBox cbModulCetak, cbSertifikat, cbAksesRekaman;
+    private JButton btnProsesPendaftaran, btnResetForm;
+    private PesertaDAO pesertaDAO;
 
     public FormPeserta() {
+        pesertaDAO = new PesertaDAO();
         initComponents();
-        initButtonGroup();
+        setTitle("Form Pendaftaran Kursus - SIKURSUS Desktop");
+        setSize(820, 720);
         setLocationRelativeTo(null);
-    }
-
-    private void initButtonGroup() {
-        bgGender = new ButtonGroup();
-        bgGender.add(rbLaki);
-        bgGender.add(rbPerempuan);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void initComponents() {
-
-        jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        txtNim = new javax.swing.JTextField();
-        btnProsesPendaftaran = new javax.swing.JButton();
-        btnResetForm = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        txtRingkasanPendaftaran = new javax.swing.JTextPane();
-        jLabel7 = new javax.swing.JLabel();
-        txtKodeAkses = new javax.swing.JPasswordField();
-        rbLaki = new javax.swing.JRadioButton();
-        rbPerempuan = new javax.swing.JRadioButton();
-        cmbPilihanKursus = new javax.swing.JComboBox<>();
-        cbModulCetak = new javax.swing.JCheckBox();
-        cbSertifikat = new javax.swing.JCheckBox();
-        cbAksesRekaman = new javax.swing.JCheckBox();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        txtNama = new javax.swing.JTextField();
-        txtEmail = new javax.swing.JTextField();
-        txtNoHp = new javax.swing.JTextField();
-        txtProdi = new javax.swing.JTextField();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Form Pendaftaran Kelas - SIKURSUS Desktop");
+    }
 
-        jPanel1.setBackground(new java.awt.Color(240, 240, 238));
+    private void initComponents() {
+        jPanel4 = new JPanel();
+        jPanel4.setBackground(ICE_BLUE_BG);
+        jPanel4.setLayout(null);
+        jPanel4.setPreferredSize(new Dimension(780, 850));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel2.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel2.setText("Nim");
+        // Header Panel
+        jPanel5 = new JPanel();
+        jPanel5.setBackground(NAVY_DARK);
+        jPanel5.setBounds(0, 0, 820, 65);
+        jPanel5.setLayout(null);
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel3.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel3.setText("Nama Peserta");
+        jLabel19 = new JLabel("Form Pendaftaran Kelas", JLabel.CENTER);
+        jLabel19.setForeground(Color.WHITE);
+        jLabel19.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        jLabel19.setBounds(0, 15, 820, 35);
+        jPanel5.add(jLabel19);
+        jPanel4.add(jPanel5);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel4.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel4.setText("Jenis Kelamin");
+        int startY = 85;
+        int gap = 45;
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel5.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel5.setText("Program Studi");
+        // NIM
+        jLabel20 = createLabel("Nim", 50, startY, 120, 25);
+        jPanel4.add(jLabel20);
+        txtNim = new JTextPane();
+        JScrollPane spNim = createScrollPane(txtNim, 180, startY, 540, 30);
+        jPanel4.add(spNim);
 
-        txtNim.setForeground(new java.awt.Color(55, 55, 52));
+        // Nama Peserta
+        startY += gap;
+        jLabel21 = createLabel("Nama Peserta", 50, startY, 120, 25);
+        jPanel4.add(jLabel21);
+        txtNama = new JTextPane();
+        JScrollPane spNama = createScrollPane(txtNama, 180, startY, 540, 30);
+        jPanel4.add(spNama);
 
-        btnProsesPendaftaran.setBackground(new java.awt.Color(125, 125, 119));
-        btnProsesPendaftaran.setForeground(new java.awt.Color(255, 255, 255));
-        btnProsesPendaftaran.setText("Proses");
-        btnProsesPendaftaran.addActionListener(this::btnProsesPendaftaranActionPerformed);
+        // Jenis Kelamin
+        startY += gap;
+        jLabel22 = createLabel("Jenis Kelamin", 50, startY, 120, 25);
+        jPanel4.add(jLabel22);
 
-        btnResetForm.setBackground(new java.awt.Color(227, 227, 224));
-        btnResetForm.setForeground(new java.awt.Color(75, 75, 70));
-        btnResetForm.setText("Resest");
-        btnResetForm.addActionListener(this::btnResetFormActionPerformed);
+        rbLaki = new JRadioButton("Laki-Laki");
+        rbLaki.setBounds(180, startY, 100, 25);
+        rbLaki.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        rbLaki.setForeground(TEXT_DARK);
+        rbLaki.setOpaque(false);
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel6.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel6.setText("Nomor Hp");
+        rbPerempuan = new JRadioButton("Perempuan");
+        rbPerempuan.setBounds(380, startY, 110, 25);
+        rbPerempuan.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        rbPerempuan.setForeground(TEXT_DARK);
+        rbPerempuan.setOpaque(false);
 
-        txtRingkasanPendaftaran.setForeground(new java.awt.Color(55, 55, 52));
-        jScrollPane2.setViewportView(txtRingkasanPendaftaran);
+        bgJk = new ButtonGroup();
+        bgJk.add(rbLaki);
+        bgJk.add(rbPerempuan);
+        jPanel4.add(rbLaki);
+        jPanel4.add(rbPerempuan);
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel7.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel7.setText("Email");
+        // Program Studi
+        startY += gap;
+        jLabel23 = createLabel("Program Studi", 50, startY, 120, 25);
+        jPanel4.add(jLabel23);
+        txtProdi = new JTextPane();
+        JScrollPane spProdi = createScrollPane(txtProdi, 180, startY, 540, 30);
+        jPanel4.add(spProdi);
 
-        txtKodeAkses.setForeground(new java.awt.Color(55, 55, 52));
+        // Nomor Hp
+        startY += gap;
+        jLabel24 = createLabel("Nomor Hp", 50, startY, 120, 25);
+        jPanel4.add(jLabel24);
+        txtNoHp = new JTextPane();
+        JScrollPane spNoHp = createScrollPane(txtNoHp, 180, startY, 540, 30);
+        jPanel4.add(spNoHp);
 
-        rbLaki.setForeground(new java.awt.Color(75, 75, 70));
-        rbLaki.setText("Laki-Laki");
+        // Email
+        startY += gap;
+        jLabel25 = createLabel("Email", 50, startY, 120, 25);
+        jPanel4.add(jLabel25);
+        txtEmail = new JTextPane();
+        JScrollPane spEmail = createScrollPane(txtEmail, 180, startY, 540, 30);
+        jPanel4.add(spEmail);
 
-        rbPerempuan.setForeground(new java.awt.Color(75, 75, 70));
-        rbPerempuan.setText("Perempuan");
+        // Kode Akses
+        startY += gap;
+        jLabel26 = createLabel("Kode Akses", 50, startY, 120, 25);
+        jPanel4.add(jLabel26);
+        txtKodeAkses = new JPasswordField();
+        txtKodeAkses.setBounds(180, startY, 540, 30);
+        txtKodeAkses.setBackground(Color.WHITE);
+        txtKodeAkses.setForeground(TEXT_DARK);
+        txtKodeAkses.setBorder(BorderFactory.createLineBorder(BORDER_SOFT, 1));
+        jPanel4.add(txtKodeAkses);
 
-        cmbPilihanKursus.setForeground(new java.awt.Color(55, 55, 52));
-        cmbPilihanKursus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { 
-            "--Pilih Kursus--", "UI/UX", "Pemrograman Java Desktop", "Pemrograman Web", "Database MySQL", "Dasar-Dasar Pemrograman" 
-        }));
+        // Pilihan Kursus
+        startY += gap;
+        jLabel28 = createLabel("kursus", 50, startY, 120, 25);
+        jPanel4.add(jLabel28);
+        cmbPilihanKursus = new JComboBox<>(new String[] { "-Pilih Kursus-", "UI/UX", "Pemrograman Java Desktop", "Pemrograman Web", "Database MySQL", "Dasar-Dasar Pemrograman" });
+        cmbPilihanKursus.setBounds(180, startY, 540, 30);
+        cmbPilihanKursus.setBackground(Color.WHITE);
+        cmbPilihanKursus.setForeground(TEXT_DARK);
+        jPanel4.add(cmbPilihanKursus);
 
-        cbModulCetak.setForeground(new java.awt.Color(75, 75, 70));
-        cbModulCetak.setText("Modul Cetak");
+        // Fasilitas
+        startY += gap;
+        jLabel27 = createLabel("Fasilitas", 50, startY, 120, 25);
+        jPanel4.add(jLabel27);
 
-        cbSertifikat.setForeground(new java.awt.Color(75, 75, 70));
-        cbSertifikat.setText("Sertifikat");
+        cbModulCetak = new JCheckBox("Modul Cetak");
+        cbModulCetak.setBounds(180, startY, 115, 25);
+        cbModulCetak.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cbModulCetak.setForeground(TEXT_DARK);
+        cbModulCetak.setOpaque(false);
 
-        cbAksesRekaman.setForeground(new java.awt.Color(75, 75, 70));
-        cbAksesRekaman.setText("Akses Rekaman");
+        cbSertifikat = new JCheckBox("Sertifikat");
+        cbSertifikat.setBounds(330, startY, 90, 25);
+        cbSertifikat.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cbSertifikat.setForeground(TEXT_DARK);
+        cbSertifikat.setOpaque(false);
 
-        jPanel2.setBackground(new java.awt.Color(167, 167, 162));
+        cbAksesRekaman = new JCheckBox("Akses Rekaman");
+        cbAksesRekaman.setBounds(500, startY, 130, 25);
+        cbAksesRekaman.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cbAksesRekaman.setForeground(TEXT_DARK);
+        cbAksesRekaman.setOpaque(false);
 
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 24));
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Form Pendaftaran Kelas");
+        jPanel4.add(cbModulCetak);
+        jPanel4.add(cbSertifikat);
+        jPanel4.add(cbAksesRekaman);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(181, 181, 181)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel1)
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
+        // Ringkasan
+        startY += gap;
+        jLabel29 = createLabel("Ringkasan", 50, startY, 120, 25);
+        jPanel4.add(jLabel29);
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel8.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel8.setText("Kursus");
+        txtRingkasanPendaftaran = new JTextPane();
+        txtRingkasanPendaftaran.setEditable(false);
+        JScrollPane spRingkasan = createScrollPane(txtRingkasanPendaftaran, 180, startY, 540, 120);
+        jPanel4.add(spRingkasan);
 
-        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel9.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel9.setText("Kode Akses");
+        // Tombol Proses & Reset
+        startY += 140;
+        btnProsesPendaftaran = new JButton("PROSES");
+        btnProsesPendaftaran.setBounds(180, startY, 110, 35);
+        btnProsesPendaftaran.setOpaque(true);
+        btnProsesPendaftaran.setContentAreaFilled(true);
+        btnProsesPendaftaran.setBackground(NAVY_DARK);
+        btnProsesPendaftaran.setForeground(Color.WHITE);
+        btnProsesPendaftaran.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnProsesPendaftaran.addActionListener(e -> btnProsesPendaftaranActionPerformed());
+        jPanel4.add(btnProsesPendaftaran);
 
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel10.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel10.setText("Fasilitas");
+        btnResetForm = new JButton("RESET");
+        btnResetForm.setBounds(305, startY, 110, 35);
+        btnResetForm.setOpaque(true);
+        btnResetForm.setContentAreaFilled(true);
+        btnResetForm.setBackground(BTN_RESET_BG);
+        btnResetForm.setForeground(NAVY_DARK);
+        btnResetForm.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnResetForm.addActionListener(e -> btnResetFormActionPerformed());
+        jPanel4.add(btnResetForm);
 
-        jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 14));
-        jLabel11.setForeground(new java.awt.Color(75, 75, 70));
-        jLabel11.setText("Ringkasan");
+        // Bungkus dengan JScrollPane utama
+        JScrollPane mainScrollPane = new JScrollPane(jPanel4);
+        mainScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        setContentPane(mainScrollPane);
+    }
 
-        txtNama.setForeground(new java.awt.Color(55, 55, 52));
-        txtEmail.setForeground(new java.awt.Color(55, 55, 52));
-        txtNoHp.setForeground(new java.awt.Color(55, 55, 52));
-        txtProdi.setForeground(new java.awt.Color(55, 55, 52));
+    private JLabel createLabel(String text, int x, int y, int w, int h) {
+        JLabel label = new JLabel(text);
+        label.setBounds(x, y, w, h);
+        label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        label.setForeground(TEXT_DARK);
+        return label;
+    }
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel11))
-                .addGap(33, 33, 33)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(cbModulCetak, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(34, 34, 34)
-                        .addComponent(cbSertifikat, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(49, 49, 49)
-                        .addComponent(cbAksesRekaman)
-                        .addContainerGap(131, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtNoHp, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtProdi, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtNama, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtNim, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2)
-                            .addComponent(txtKodeAkses, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbPilihanKursus, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                        .addComponent(rbLaki, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(42, 42, 42)
-                                        .addComponent(rbPerempuan, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                        .addGap(150, 150, 150)
-                                        .addComponent(btnProsesPendaftaran, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(40, 40, 40)
-                                        .addComponent(btnResetForm, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(45, 45, 45))))
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(rbLaki)
-                    .addComponent(rbPerempuan))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(txtProdi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(txtNoHp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(txtKodeAkses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(cmbPilihanKursus, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(cbModulCetak)
-                    .addComponent(cbSertifikat)
-                    .addComponent(cbAksesRekaman))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel11)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnProsesPendaftaran)
-                    .addComponent(btnResetForm))
-                .addContainerGap(20, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        pack();
+    private JScrollPane createScrollPane(JTextPane textPane, int x, int y, int w, int h) {
+        textPane.setBackground(Color.WHITE);
+        textPane.setForeground(TEXT_DARK);
+        JScrollPane sp = new JScrollPane(textPane);
+        sp.setBounds(x, y, w, h);
+        sp.setBorder(BorderFactory.createLineBorder(BORDER_SOFT, 1));
+        return sp;
     }
 
     private void resetForm() {
         txtNim.setText("");
         txtNama.setText("");
-        if (bgGender != null) {
-            bgGender.clearSelection();
-        } else {
-            rbLaki.setSelected(false);
-            rbPerempuan.setSelected(false);
-        }
+        bgJk.clearSelection();
         txtProdi.setText("");
         txtNoHp.setText("");
         txtEmail.setText("");
@@ -307,7 +238,14 @@ public class FormPeserta extends JFrame {
         txtNim.requestFocus();
     }
 
-    private void btnProsesPendaftaranActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnResetFormActionPerformed() {
+        int jawab = JOptionPane.showConfirmDialog(this, "Kosongkan seluruh input?", "Konfirmasi Reset", JOptionPane.YES_NO_OPTION);
+        if (jawab == JOptionPane.YES_OPTION) {
+            resetForm();
+        }
+    }
+
+    private void btnProsesPendaftaranActionPerformed() {
         String nim = txtNim.getText().trim();
         String nama = txtNama.getText().trim();
         String jenisKelamin = rbLaki.isSelected() ? "L" : (rbPerempuan.isSelected() ? "P" : "");
@@ -316,11 +254,8 @@ public class FormPeserta extends JFrame {
         String email = txtEmail.getText().trim();
         String kursus = cmbPilihanKursus.getSelectedItem().toString();
 
-        if (nim.isEmpty() || nama.isEmpty() || prodi.isEmpty()) {
-            JOptionPane.showMessageDialog(this, 
-                "NIM, Nama, dan Prodi wajib diisi!", 
-                "Peringatan Validasi", 
-                JOptionPane.WARNING_MESSAGE);
+        if (nim.isEmpty() || nama.isEmpty() || prodi.isEmpty() || jenisKelamin.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "NIM, Nama, Prodi, dan Jenis Kelamin wajib diisi!", "Peringatan Validasi", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -367,7 +302,7 @@ public class FormPeserta extends JFrame {
         sb.append("====================================\n");
         sb.append(String.format("%-15s : %s\n", "NIM", nim));
         sb.append(String.format("%-15s : %s\n", "Nama", nama));
-        sb.append(String.format("%-15s : %s\n", "Gender", jenisKelamin.equals("L") ? "Laki-laki" : (jenisKelamin.equals("P") ? "Perempuan" : "-")));
+        sb.append(String.format("%-15s : %s\n", "Gender", jenisKelamin.equals("L") ? "Laki-laki" : "Perempuan"));
         sb.append(String.format("%-15s : %s\n", "Prodi", prodi));
         sb.append(String.format("%-15s : %s\n", "No HP", noHp));
         sb.append(String.format("%-15s : %s\n", "Email", email));
@@ -381,78 +316,28 @@ public class FormPeserta extends JFrame {
         txtRingkasanPendaftaran.setText(sb.toString());
 
         try {
-            Peserta peserta = new Peserta(nim, nama, jenisKelamin, prodi, noHp, email);
-            PesertaDAO dao = new PesertaDAO();
-            boolean sukses = dao.insert(peserta);
+            Peserta peserta = new Peserta();
+            peserta.setNim(nim);
+            peserta.setNama(nama);
+            peserta.setJenisKelamin(jenisKelamin);
+            peserta.setProdi(prodi);
+            peserta.setNoHp(noHp);
+            peserta.setEmail(email);
 
+            boolean sukses = pesertaDAO.insert(peserta);
             if (sukses) {
-                JOptionPane.showMessageDialog(this, 
-                    "Data peserta berhasil disimpan ke database XAMPP!", 
-                    "Informasi Sukses", 
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Data peserta berhasil disimpan ke database XAMPP!", "Informasi Sukses", JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, 
-                "Gagal menyimpan ke database:\n" + e.getMessage(), 
-                "Database Error", 
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Gagal menyimpan ke database:\n" + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
 
-    private void btnResetFormActionPerformed(java.awt.event.ActionEvent evt) {
-        int jawab = JOptionPane.showConfirmDialog(
-            this,
-            "Kosongkan seluruh input?",
-            "Konfirmasi Reset",
-            JOptionPane.YES_NO_OPTION);
-
-        if (jawab == JOptionPane.YES_OPTION) {
-            resetForm();
-        }
-    }
-
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        java.awt.EventQueue.invokeLater(() -> new FormPeserta().setVisible(true));
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {}
+        EventQueue.invokeLater(() -> new FormPeserta().setVisible(true));
     }
-
-    private javax.swing.JButton btnProsesPendaftaran;
-    private javax.swing.JButton btnResetForm;
-    private javax.swing.JCheckBox cbAksesRekaman;
-    private javax.swing.JCheckBox cbModulCetak;
-    private javax.swing.JCheckBox cbSertifikat;
-    private javax.swing.JComboBox<String> cmbPilihanKursus;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JRadioButton rbLaki;
-    private javax.swing.JRadioButton rbPerempuan;
-    private javax.swing.JTextField txtEmail;
-    private javax.swing.JPasswordField txtKodeAkses;
-    private javax.swing.JTextField txtNama;
-    private javax.swing.JTextField txtNim;
-    private javax.swing.JTextField txtNoHp;
-    private javax.swing.JTextField txtProdi;
-    private javax.swing.JTextPane txtRingkasanPendaftaran;
 }

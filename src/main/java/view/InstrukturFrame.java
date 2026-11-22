@@ -1,184 +1,105 @@
 package view;
 
+import dao.InstrukturDAO;
+import java.awt.BorderLayout;
+import java.sql.SQLException;
+import java.util.List;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import javax.swing.table.DefaultTableModel;
+import model.Instruktur;
 
 public class InstrukturFrame extends JFrame {
-
-    private JTextField txtId, txtNama, txtKeahlian, txtNoHp;
-    private JTable table;
-    private JButton btnSimpan, btnEdit, btnHapus, btnReset;
-
-    // --- COLOR PALETTE: MODERN LIGHT GRAY (SLATE THEME) ---
-    private static final Color COLOR_BG = new Color(241, 245, 249);         // Slate 100
-    private static final Color COLOR_HEADER_BG = Color.WHITE;               // Header bersih
-    private static final Color COLOR_CARD_BG = Color.WHITE;                 // Card putih bersih
-    private static final Color COLOR_TEXT_DARK = new Color(15, 23, 42);     // Slate 900
-    private static final Color COLOR_TEXT_MUTED = new Color(100, 116, 139); // Slate 500
-    private static final Color COLOR_ACCENT = new Color(79, 70, 229);       // Indigo modern
-    private static final Color COLOR_BORDER = new Color(226, 232, 240);     // Slate 200
-    private static final Color COLOR_BTN_BG = new Color(248, 250, 252);     // Slate 50
+    private final JTextField nama = new JTextField();
+    private final JTextField keahlian = new JTextField();
+    private final JTextField hp = new JTextField();
+    private final JTextField email = new JTextField();
+    private final JTextField search = new JTextField(18);
+    private final JTable table = new JTable(ViewUtil.tableModel("ID", "Nama", "Keahlian", "No. HP", "Email"));
+    private final InstrukturDAO dao = new InstrukturDAO();
+    private int selected = -1;
 
     public InstrukturFrame() {
-        setTitle("Master Instruktur - SIKURSUS Desktop");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        initComponents();
+        super("Master Instruktur - SIKURSUS Desktop");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        ViewUtil.setupFrame(this, 940, 650);
+        build();
+        load("");
     }
 
-    private void initComponents() {
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(COLOR_BG);
-        setContentPane(mainPanel);
+    private void build() {
+        JPanel root = ViewUtil.root("Master Data Instruktur");
+        JPanel body = ViewUtil.body();
 
-        // --- HEADER BANNER ---
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(COLOR_HEADER_BG);
-        headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER),
-            new EmptyBorder(18, 25, 18, 25)
-        ));
+        JPanel form = ViewUtil.formPanel();
+        ViewUtil.addFormRow(form, 0, "Nama Instruktur", nama);
+        ViewUtil.addFormRow(form, 1, "Keahlian", keahlian);
+        ViewUtil.addFormRow(form, 2, "Nomor HP", hp);
+        ViewUtil.addFormRow(form, 3, "Email", email);
 
-        JLabel lblTitle = new JLabel("Form Master Instruktur");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblTitle.setForeground(COLOR_TEXT_DARK);
-        headerPanel.add(lblTitle, BorderLayout.WEST);
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        JButton simpan = ViewUtil.primaryButton("Simpan");
+        JButton ubah = ViewUtil.updateButton("Ubah");
+        JButton hapus = ViewUtil.dangerButton("Hapus");
+        JButton reset = ViewUtil.neutralButton("Reset");
+        JPanel formBox = new JPanel(new BorderLayout());
+        formBox.setBackground(ViewUtil.BG);
+        formBox.add(form, BorderLayout.CENTER);
+        formBox.add(ViewUtil.actionPanel(simpan, ubah, hapus, reset), BorderLayout.SOUTH);
 
-        // --- FORM CONTENT PANEL (CARD) ---
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.setOpaque(false);
-        contentPanel.setBorder(new EmptyBorder(20, 25, 10, 25));
+        JButton cari = ViewUtil.updateButton("Cari");
+        JPanel tableBox = new JPanel(new BorderLayout(0, 8));
+        tableBox.setBackground(ViewUtil.CARD);
+        tableBox.add(ViewUtil.searchPanel("Pencarian", search, cari), BorderLayout.NORTH);
+        tableBox.add(ViewUtil.tableScroll(table), BorderLayout.CENTER);
 
-        JPanel formCard = new JPanel(new GridBagLayout());
-        formCard.setBackground(COLOR_CARD_BG);
-        formCard.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDER, 1, true),
-            new EmptyBorder(25, 30, 25, 30)
-        ));
+        body.add(ViewUtil.section("Form Instruktur", formBox), BorderLayout.NORTH);
+        body.add(ViewUtil.section("Data Instruktur", tableBox), BorderLayout.CENTER);
+        root.add(body, BorderLayout.CENTER);
+        setContentPane(root);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // ID Instruktur
-        gbc.gridx = 0; gbc.gridy = 0;
-        JLabel lblId = new JLabel("ID Instruktur");
-        lblId.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblId.setForeground(COLOR_TEXT_DARK);
-        formCard.add(lblId, gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        txtId = new JTextField(20);
-        txtId.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        formCard.add(txtId, gbc);
-
-        // Nama Instruktur
-        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.0;
-        JLabel lblNama = new JLabel("Nama Instruktur");
-        lblNama.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblNama.setForeground(COLOR_TEXT_DARK);
-        formCard.add(lblNama, gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
-        txtNama = new JTextField(20);
-        txtNama.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        formCard.add(txtNama, gbc);
-
-        // Keahlian
-        gbc.gridx = 0; gbc.gridy = 2;
-        JLabel lblKeahlian = new JLabel("Bidang Keahlian");
-        lblKeahlian.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblKeahlian.setForeground(COLOR_TEXT_DARK);
-        formCard.add(lblKeahlian, gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
-        txtKeahlian = new JTextField(20);
-        txtKeahlian.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        formCard.add(txtKeahlian, gbc);
-
-        // Nomor HP
-        gbc.gridx = 0; gbc.gridy = 3;
-        JLabel lblNoHp = new JLabel("Nomor HP");
-        lblNoHp.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblNoHp.setForeground(COLOR_TEXT_DARK);
-        formCard.add(lblNoHp, gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
-        txtNoHp = new JTextField(20);
-        txtNoHp.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        formCard.add(txtNoHp, gbc);
-
-        // Tombol Aksi
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        btnPanel.setOpaque(false);
-        
-        btnSimpan = new JButton("SIMPAN");
-        btnSimpan.setBackground(COLOR_ACCENT);
-        btnSimpan.setForeground(Color.WHITE);
-        btnSimpan.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnSimpan.setFocusPainted(false);
-        btnSimpan.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
-        btnSimpan.addActionListener(e -> JOptionPane.showMessageDialog(this, "Data Instruktur berhasil disimpan."));
-
-        btnEdit = new JButton("EDIT");
-        btnEdit.setBackground(COLOR_BTN_BG);
-        btnEdit.setForeground(COLOR_TEXT_DARK);
-        btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnEdit.setFocusPainted(false);
-        btnEdit.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDER, 1),
-            BorderFactory.createEmptyBorder(7, 16, 7, 16)
-        ));
-
-        btnHapus = new JButton("HAPUS");
-        btnHapus.setBackground(COLOR_BTN_BG);
-        btnHapus.setForeground(COLOR_TEXT_DARK);
-        btnHapus.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnHapus.setFocusPainted(false);
-        btnHapus.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDER, 1),
-            BorderFactory.createEmptyBorder(7, 16, 7, 16)
-        ));
-
-        btnReset = new JButton("RESET");
-        btnReset.setBackground(COLOR_BTN_BG);
-        btnReset.setForeground(COLOR_TEXT_DARK);
-        btnReset.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnReset.setFocusPainted(false);
-        btnReset.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(COLOR_BORDER, 1),
-            BorderFactory.createEmptyBorder(7, 16, 7, 16)
-        ));
-        btnReset.addActionListener(e -> { txtId.setText(""); txtNama.setText(""); txtKeahlian.setText(""); txtNoHp.setText(""); });
-
-        btnPanel.add(btnSimpan);
-        btnPanel.add(btnEdit);
-        btnPanel.add(btnHapus);
-        btnPanel.add(btnReset);
-
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2; gbc.insets = new Insets(15, 10, 5, 10);
-        formCard.add(btnPanel, gbc);
-
-        contentPanel.add(formCard, BorderLayout.CENTER);
-        mainPanel.add(contentPanel, BorderLayout.NORTH);
-
-        // --- TABEL PANEL ---
-        table = new JTable(new Object[][]{}, new String[]{"ID Instruktur", "Nama Instruktur", "Bidang Keahlian", "Nomor HP"});
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-        table.setRowHeight(24);
-        
-        JScrollPane scroll = new JScrollPane(table);
-        scroll.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
-
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setOpaque(false);
-        tablePanel.setBorder(new EmptyBorder(10, 25, 25, 25));
-        tablePanel.add(scroll, BorderLayout.CENTER);
-
-        mainPanel.add(tablePanel, BorderLayout.CENTER);
+        simpan.addActionListener(e -> save());
+        ubah.addActionListener(e -> update());
+        hapus.addActionListener(e -> delete());
+        reset.addActionListener(e -> clear());
+        cari.addActionListener(e -> load(search.getText()));
+        search.addActionListener(e -> load(search.getText()));
+        table.getSelectionModel().addListSelectionListener(e -> pick());
+        getRootPane().setDefaultButton(simpan);
     }
+
+    private Instruktur data() {
+        Instruktur x = new Instruktur();
+        x.setId(Math.max(selected, 0));
+        x.setNama(nama.getText());
+        x.setKeahlian(keahlian.getText());
+        x.setNoHp(hp.getText());
+        x.setEmail(email.getText());
+        return x;
+    }
+
+    private void save() { try { dao.insert(data()); load(""); clear(); } catch (Exception ex) { handle(ex, "Menyimpan instruktur"); } }
+    private void update() { if (selected < 0) { JOptionPane.showMessageDialog(this, "Pilih instruktur."); return; } try { dao.update(data()); load(""); clear(); } catch (Exception ex) { handle(ex, "Mengubah instruktur"); } }
+    private void delete() { if (selected < 0) return; if (JOptionPane.showConfirmDialog(this, "Hapus instruktur?", "Konfirmasi", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return; try { dao.delete(selected); load(""); clear(); } catch (SQLException ex) { ViewUtil.sqlError(this, "Menghapus instruktur", ex); } }
+
+    private void load(String q) {
+        try {
+            List<Instruktur> list = dao.search(q);
+            DefaultTableModel m = (DefaultTableModel) table.getModel();
+            m.setRowCount(0);
+            for (Instruktur x : list) m.addRow(new Object[]{x.getId(), x.getNama(), x.getKeahlian(), x.getNoHp(), x.getEmail()});
+        } catch (SQLException ex) { ViewUtil.sqlError(this, "Memuat instruktur", ex); }
+    }
+
+    private void pick() {
+        int r = table.getSelectedRow();
+        if (r < 0) return;
+        selected = Integer.parseInt(table.getValueAt(r, 0).toString());
+        nama.setText(table.getValueAt(r, 1).toString());
+        keahlian.setText(table.getValueAt(r, 2).toString());
+        hp.setText(String.valueOf(table.getValueAt(r, 3)));
+        email.setText(String.valueOf(table.getValueAt(r, 4)));
+    }
+
+    private void clear() { selected = -1; nama.setText(""); keahlian.setText(""); hp.setText(""); email.setText(""); table.clearSelection(); nama.requestFocus(); }
+    private void handle(Exception ex, String action) { if (ex instanceof SQLException) ViewUtil.sqlError(this, action, (SQLException) ex); else JOptionPane.showMessageDialog(this, ex.getMessage()); }
 }

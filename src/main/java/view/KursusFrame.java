@@ -1,134 +1,101 @@
 package view;
 
+import dao.KursusDAO;
+import java.awt.BorderLayout;
+import java.sql.SQLException;
+import java.util.List;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import javax.swing.table.DefaultTableModel;
+import model.Kursus;
 
 public class KursusFrame extends JFrame {
-
-    private JTextField txtKodeKursus, txtNamaKursus, txtBiaya;
-    private JComboBox<String> cmbLevel;
-    private JTable table;
-    private JButton btnSimpan, btnEdit, btnHapus, btnReset;
+    private final JTextField kode = new JTextField();
+    private final JTextField nama = new JTextField();
+    private final JTextField biaya = new JTextField();
+    private final JTextField search = new JTextField(18);
+    private final JComboBox<String> level = new JComboBox<>(new String[]{"BASIC", "INTERMEDIATE", "ADVANCED"});
+    private final JTable table = new JTable(ViewUtil.tableModel("ID", "Kode", "Nama Kursus", "Level", "Biaya"));
+    private final KursusDAO dao = new KursusDAO();
+    private int selected = -1;
 
     public KursusFrame() {
-        setTitle("Master Kursus - SIKURSUS Desktop");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(750, 520);
-        setLocationRelativeTo(null);
-        initComponents();
+        super("Master Kursus - SIKURSUS Desktop");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        ViewUtil.setupFrame(this, 940, 650);
+        build();
+        load("");
     }
 
-    private void initComponents() {
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 242, 250));
-        setContentPane(mainPanel);
+    private void build() {
+        JPanel root = ViewUtil.root("Master Data Kursus");
+        JPanel body = ViewUtil.body();
+        JPanel form = ViewUtil.formPanel();
+        ViewUtil.addFormRow(form, 0, "Kode Kursus", kode);
+        ViewUtil.addFormRow(form, 1, "Nama Kursus", nama);
+        ViewUtil.addFormRow(form, 2, "Level", level);
+        ViewUtil.addFormRow(form, 3, "Biaya", biaya);
 
-        // Header Banner
-        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        headerPanel.setBackground(new Color(120, 102, 155));
-        headerPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
-        JLabel lblTitle = new JLabel("Form Master Kursus");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblTitle.setForeground(Color.WHITE);
-        headerPanel.add(lblTitle);
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        JButton simpan = ViewUtil.primaryButton("Simpan");
+        JButton ubah = ViewUtil.updateButton("Ubah");
+        JButton hapus = ViewUtil.dangerButton("Hapus");
+        JButton reset = ViewUtil.neutralButton("Reset");
+        JPanel formBox = new JPanel(new BorderLayout());
+        formBox.setBackground(ViewUtil.BG);
+        formBox.add(form, BorderLayout.CENTER);
+        formBox.add(ViewUtil.actionPanel(simpan, ubah, hapus, reset), BorderLayout.SOUTH);
 
-        // Form Content Panel
-        JPanel contentPanel = new JPanel(new GridBagLayout());
-        contentPanel.setOpaque(false);
-        contentPanel.setBorder(new EmptyBorder(20, 25, 20, 25));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
+        JButton cari = ViewUtil.updateButton("Cari");
+        JPanel tableBox = new JPanel(new BorderLayout(0, 8));
+        tableBox.setBackground(ViewUtil.CARD);
+        tableBox.add(ViewUtil.searchPanel("Pencarian", search, cari), BorderLayout.NORTH);
+        tableBox.add(ViewUtil.tableScroll(table), BorderLayout.CENTER);
 
-        // Kode Kursus
-        gbc.gridx = 0; gbc.gridy = 0;
-        JLabel lblKode = new JLabel("Kode Kursus");
-        lblKode.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblKode.setForeground(new Color(91, 75, 108));
-        contentPanel.add(lblKode, gbc);
+        body.add(ViewUtil.section("Form Kursus", formBox), BorderLayout.NORTH);
+        body.add(ViewUtil.section("Data Kursus", tableBox), BorderLayout.CENTER);
+        root.add(body, BorderLayout.CENTER);
+        setContentPane(root);
 
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-        txtKodeKursus = new JTextField(20);
-        contentPanel.add(txtKodeKursus, gbc);
-
-        // Nama Kursus
-        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.0;
-        JLabel lblNama = new JLabel("Nama Kursus");
-        lblNama.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblNama.setForeground(new Color(91, 75, 108));
-        contentPanel.add(lblNama, gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
-        txtNamaKursus = new JTextField(20);
-        contentPanel.add(txtNamaKursus, gbc);
-
-        // Level
-        gbc.gridx = 0; gbc.gridy = 2;
-        JLabel lblLevel = new JLabel("Level");
-        lblLevel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblLevel.setForeground(new Color(91, 75, 108));
-        contentPanel.add(lblLevel, gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
-        cmbLevel = new JComboBox<>(new String[]{"BEGINNER", "INTERMEDIATE", "ADVANCED"});
-        contentPanel.add(cmbLevel, gbc);
-
-        // Biaya
-        gbc.gridx = 0; gbc.gridy = 3;
-        JLabel lblBiaya = new JLabel("Biaya (Rp)");
-        lblBiaya.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblBiaya.setForeground(new Color(91, 75, 108));
-        contentPanel.add(lblBiaya, gbc);
-
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
-        txtBiaya = new JTextField(20);
-        contentPanel.add(txtBiaya, gbc);
-
-        // Tombol Aksi
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 10));
-        btnPanel.setOpaque(false);
-        
-        btnSimpan = new JButton("SIMPAN");
-        btnSimpan.setBackground(new Color(120, 102, 155));
-        btnSimpan.setForeground(Color.WHITE);
-        btnSimpan.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnSimpan.addActionListener(e -> JOptionPane.showMessageDialog(this, "Data Kursus berhasil disimpan."));
-
-        btnEdit = new JButton("EDIT");
-        btnEdit.setBackground(new Color(233, 226, 243));
-        btnEdit.setForeground(new Color(91, 75, 108));
-        btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        btnHapus = new JButton("HAPUS");
-        btnHapus.setBackground(new Color(233, 226, 243));
-        btnHapus.setForeground(new Color(91, 75, 108));
-        btnHapus.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        btnReset = new JButton("RESET");
-        btnReset.setBackground(new Color(233, 226, 243));
-        btnReset.setForeground(new Color(91, 75, 108));
-        btnReset.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnReset.addActionListener(e -> { txtKodeKursus.setText(""); txtNamaKursus.setText(""); txtBiaya.setText(""); });
-
-        btnPanel.add(btnSimpan);
-        btnPanel.add(btnEdit);
-        btnPanel.add(btnHapus);
-        btnPanel.add(btnReset);
-
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
-        contentPanel.add(btnPanel, gbc);
-
-        // Tabel
-        table = new JTable(new Object[][]{}, new String[]{"Kode Kursus", "Nama Kursus", "Level", "Biaya"});
-        JScrollPane scroll = new JScrollPane(table);
-        scroll.setPreferredSize(new Dimension(650, 140));
-
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        contentPanel.add(scroll, gbc);
-
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        simpan.addActionListener(e -> save());
+        ubah.addActionListener(e -> update());
+        hapus.addActionListener(e -> delete());
+        reset.addActionListener(e -> clear());
+        cari.addActionListener(e -> load(search.getText()));
+        search.addActionListener(e -> load(search.getText()));
+        table.getSelectionModel().addListSelectionListener(e -> pick());
+        getRootPane().setDefaultButton(simpan);
     }
+
+    private Kursus data() {
+        double n;
+        try { n = Double.parseDouble(biaya.getText().trim()); }
+        catch (Exception ex) { throw new IllegalArgumentException("Biaya harus berupa angka"); }
+        return new Kursus(Math.max(selected, 0), kode.getText(), nama.getText(), level.getSelectedItem().toString(), n);
+    }
+
+    private void save() { try { dao.insert(data()); load(""); clear(); } catch (Exception ex) { handle(ex, "Menyimpan kursus"); } }
+    private void update() { if (selected < 0) { JOptionPane.showMessageDialog(this, "Pilih kursus."); return; } try { dao.update(data()); load(""); clear(); } catch (Exception ex) { handle(ex, "Mengubah kursus"); } }
+    private void delete() { if (selected < 0) return; if (JOptionPane.showConfirmDialog(this, "Hapus kursus?", "Konfirmasi", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return; try { dao.delete(selected); load(""); clear(); } catch (SQLException ex) { ViewUtil.sqlError(this, "Menghapus kursus", ex); } }
+
+    private void load(String q) {
+        try {
+            List<Kursus> list = dao.search(q);
+            DefaultTableModel m = (DefaultTableModel) table.getModel();
+            m.setRowCount(0);
+            for (Kursus x : list) m.addRow(new Object[]{x.getIdKursus(), x.getKode(), x.getNama(), x.getLevel(), String.format("%,.0f", x.getBiaya())});
+        } catch (SQLException ex) { ViewUtil.sqlError(this, "Memuat kursus", ex); }
+    }
+
+    private void pick() {
+        int r = table.getSelectedRow();
+        if (r < 0) return;
+        selected = Integer.parseInt(table.getValueAt(r, 0).toString());
+        kode.setText(table.getValueAt(r, 1).toString());
+        nama.setText(table.getValueAt(r, 2).toString());
+        level.setSelectedItem(table.getValueAt(r, 3));
+        biaya.setText(table.getValueAt(r, 4).toString().replace(",", ""));
+    }
+
+    private void clear() { selected = -1; kode.setText(""); nama.setText(""); biaya.setText(""); level.setSelectedIndex(0); table.clearSelection(); kode.requestFocus(); }
+    private void handle(Exception ex, String action) { if (ex instanceof SQLException) ViewUtil.sqlError(this, action, (SQLException) ex); else JOptionPane.showMessageDialog(this, ex.getMessage()); }
 }
